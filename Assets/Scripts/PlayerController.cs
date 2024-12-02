@@ -5,7 +5,9 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     private Rigidbody2D playerRigidBody;
-    public float playerSpeed = 1f;
+
+    public float playerSpeed = 0.6f;
+    public float currentSpeed;
 
     public Vector2 playerDirection;
 
@@ -24,6 +26,11 @@ public class PlayerController : MonoBehaviour
 
     private bool comboControl;
 
+    // Inidicar se o Player esta morto
+    private bool isDead;
+
+
+
     void Start()
     {
         //Obtem e inicializa as propriedades do RigiBody2D
@@ -31,6 +38,8 @@ public class PlayerController : MonoBehaviour
 
         // Obtem e inicializa as propiedades do animator
         playerAnimator = GetComponent<Animator>();
+
+        currentSpeed = playerSpeed;
 
     }
 
@@ -42,15 +51,14 @@ public class PlayerController : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.E))
         {
-            if (isWalking == false )
-            {
+            //Iniciar o temporizador
                 if (punchCount < 2)
                 {
                     PlayerJab();
                     punchCount++;
                     if (!comboControl)
                     {
-                        //Iniciar o temporizador
+                        
                         StartCoroutine(CrossController());
                     }
                 }
@@ -58,8 +66,7 @@ public class PlayerController : MonoBehaviour
                 {
                     PlayerCross();
                     punchCount = 0;
-                }
-            }
+                }           
         }
 
         // Parando o temporizador
@@ -81,7 +88,7 @@ public class PlayerController : MonoBehaviour
             isWalking = false;
         }
 
-        playerRigidBody.MovePosition(playerRigidBody.position + playerSpeed * Time.fixedDeltaTime * playerDirection);
+        playerRigidBody.MovePosition(playerRigidBody.position + currentSpeed * Time.fixedDeltaTime * playerDirection);
     }
 
     void PlayerMove()
@@ -142,6 +149,16 @@ public class PlayerController : MonoBehaviour
         yield return new WaitForSeconds(timeCross);
         punchCount = 0;
         comboControl = false;
+    }
+
+    void ZeroSpeed()
+    {
+        currentSpeed = 0;
+    }
+
+    void ResetSpeed()
+    {
+        currentSpeed = playerSpeed;
     }
 }
 
