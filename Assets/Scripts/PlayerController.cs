@@ -49,7 +49,7 @@ public class PlayerController : MonoBehaviour
         PlayerMove();
         UpdateAnimator();
 
-        if (Input.GetKeyDown(KeyCode.E))
+        if (Input.GetKeyDown(KeyCode.Space))
         {
             //Iniciar o temporizador
                 if (punchCount < 2)

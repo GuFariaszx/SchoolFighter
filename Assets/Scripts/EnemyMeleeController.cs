@@ -51,6 +51,9 @@ public class EnemyMeleeController : MonoBehaviour
 
         // Inicializar a velocidade do inimigo
         currentSpeed = enemySpeed;
+
+        // Inicializar a vida do inimigo
+        currentHealth = maxHealth;
     }
 
     void Update()
@@ -118,47 +121,50 @@ public class EnemyMeleeController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        // MOVIMENTAÇÃO
-        
-        // Variavel para armazenar a distância entre o Inimigo e o Player
-        Vector3 targetDistance = target.position - this.transform.position;
-
-        // Determina se a força horizontal deve ser negativa ou positiva
-        // 5 / 5 = 1
-        // -5 / 5 = -1
-        horizontalForce = targetDistance.x / Mathf.Abs(targetDistance.x);
-
-        // Entre 1 e 2 segundos, será feita uma definição vetical
-        if (walkTimer >= Random.Range(1f, 2f))
+        if (!isDead)
         {
-            verticalForce = Random.Range(-1, 2);
+            // MOVIMENTAÇÃO
 
-            // Zera o timr de movimentação para andar verticalmente novamente daqui a +- 1 segundo
-            walkTimer = 0;
-        }
-        
-        // Caso estaeja perto do Player, parar  a movimentação
-        if (Mathf.Abs(targetDistance.x) < 0.2f)
-        {
-            horizontalForce = 0;    
-        }
+            // Variavel para armazenar a distância entre o Inimigo e o Player
+            Vector3 targetDistance = target.position - this.transform.position;
 
-        // Aplica a velocidade no inimigo fazendo o movimentar
-        rb.linearVelocity = new Vector2(horizontalForce * currentSpeed, verticalForce* currentSpeed);
+            // Determina se a força horizontal deve ser negativa ou positiva
+            // 5 / 5 = 1
+            // -5 / 5 = -1
+            horizontalForce = targetDistance.x / Mathf.Abs(targetDistance.x);
 
-        // ATAQUE
-        // Se estiver perto do Player e o timer do jogo for maior que o valor de nextAttack 
-        if (Mathf.Abs(targetDistance.x) < 0.2f && Mathf.Abs(targetDistance.y) < 0.05f && Time.time > nextAttack)
-        {
-            // Esse comando executa a naimação de ataque do inimigo
-            animator.SetTrigger("Attack");
+            // Entre 1 e 2 segundos, será feita uma definição vetical
+            if (walkTimer >= Random.Range(1f, 2f))
+            {
+                verticalForce = Random.Range(-1, 2);
 
-            // Após executar a ação, zera a velocidade do inimigo, portanto, zeroSpeed
-            zeroSpeed();
+                // Zera o timr de movimentação para andar verticalmente novamente daqui a +- 1 segundo
+                walkTimer = 0;
+            }
 
-            // Pega o tempo atual e soma o attackRate, para definir a partir de quando o inimigo poderá atacar novamente
-            nextAttack = Time.time + attackRate;
-        }
+            // Caso estaeja perto do Player, parar  a movimentação
+            if (Mathf.Abs(targetDistance.x) < 0.2f)
+            {
+                horizontalForce = 0;
+            }
+
+            // Aplica a velocidade no inimigo fazendo o movimentar
+            rb.linearVelocity = new Vector2(horizontalForce * currentSpeed, verticalForce * currentSpeed);
+
+            // ATAQUE
+            // Se estiver perto do Player e o timer do jogo for maior que o valor de nextAttack 
+            if (Mathf.Abs(targetDistance.x) < 0.2f && Mathf.Abs(targetDistance.y) < 0.05f && Time.time > nextAttack)
+            {
+                // Esse comando executa a naimação de ataque do inimigo
+                animator.SetTrigger("Attack");
+
+                // Após executar a ação, zera a velocidade do inimigo, portanto, zeroSpeed
+                zeroSpeed();
+
+                // Pega o tempo atual e soma o attackRate, para definir a partir de quando o inimigo poderá atacar novamente
+                nextAttack = Time.time + attackRate;
+            }
+        }   
     }
 
     void UpdateAnimator()
@@ -175,6 +181,15 @@ public class EnemyMeleeController : MonoBehaviour
             currentHealth -= damage;
 
             animator.SetTrigger("hitDamage");
+
+            if (currentHealth <= 0)
+            {
+                isDead = true;
+
+                zeroSpeed();
+
+                animator.SetTrigger("Dead");
+            }
         }
     }
 
@@ -186,5 +201,10 @@ public class EnemyMeleeController : MonoBehaviour
     void ResetSpeed()
     {
         currentSpeed = enemySpeed;
+    }
+
+    public void DisableEnemy()
+    {
+        this.gameObject.SetActive(false);   
     }
 }
