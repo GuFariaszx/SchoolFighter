@@ -2186,7 +2186,7 @@ MonoBehaviour:
   - {fileID: 1884997239}
   numberOfEnemies: 3
   spawnTime: 1
-  nextSection: 
+  nextSection: Section2
 --- !u!61 &1637387577
 BoxCollider2D:
   m_ObjectHideFlags: 0
